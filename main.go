@@ -55,10 +55,14 @@ type flags struct {
 func getArgs() (flags, bool) {
 	args := flags{}
 
-	args.Driver = flag.String("d", "", "driver name  (e.g mysql)")
-	args.Source = flag.String("s", "", "source (e.g user:passwd@tcp(host:3306)/database )")
+	args.Driver = flag.String("d", "", "driver name  (mysql, mssql, oracle)")
+	args.Source = flag.String("s", "",
+		`source
+(e.g mysql user:passwd@tcp(host:3306)/database) 
+(e.g mssql server=localhost;uid=dev;pwd=devmember;database=dbname) 
+(e.g oracle user/passwd@host:port/sid`)
 	args.Query = flag.String("q", "", "query ")
-	flag.Bool("", false, "ver. 200617.0")
+	flag.Bool("", false, "ver. 210215.0")
 	flag.Parse()
 
 	isFlagPassed := func(name string) bool {
