@@ -1,61 +1,86 @@
 package main
 
 import (
+	"bufio"
 	"database/sql"
 	"flag"
 	"fmt"
+	"os"
+	"strings"
 
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/godror/godror"
 )
 
-func PrintRows(rows *sql.Rows) {
+// PrintRows Rows
+func PrintRows(rows *sql.Rows, filename string, fs string, rs string) {
 	cols, _ := rows.Columns()
 	colsize := len(cols)
+	colsArr := []string{}
+	fin, err := os.Create(filename)
+	if err != nil {
+		panic(err)
+	}
+	defer fin.Close()
+
+	w := bufio.NewWriter(fin)
+	idx := 0
 
 	for rows.Next() {
-		line := ""
-		coldata := make([]interface{}, colsize)
+		colmeta := make([]interface{}, colsize)
 
 		for i := 0; i < colsize; i++ {
-			coldata[i] = new(interface{})
+			colmeta[i] = new(interface{})
 		}
-		rows.Scan(coldata...)
+		rows.Scan(colmeta...)
 
 		for i := 0; i < colsize; i++ {
-			v := coldata[i].(*interface{})
+			v := colmeta[i].(*interface{})
 			var c string
 
 			switch (*v).(type) {
 			case nil:
 				c = ""
-			case int64:
-				c = fmt.Sprintf("%v", *v)
 			default:
 				c = fmt.Sprintf("%s", *v)
 			}
 
-			line += c
-			if i != (colsize - 1) {
-				line += ","
-			}
+			colsArr = append(colsArr, c)
 		}
+		line := strings.Join(colsArr, fs)
+		colsArr = colsArr[:0]
 
-		fmt.Println(line)
+		w.WriteString(line)
+		w.WriteString(rs)
+
+		if (idx % 10000) == 0 {
+			w.Flush()
+			fmt.Printf("> %10d rows flush     \r", idx)
+		}
+		idx++
 	}
+
+	w.Flush()
+	fmt.Printf("> %10d rows flush     \n", idx)
 }
 
 type flags struct {
-	Driver *string
-	Source *string
-	Query  *string
+	Driver    *string
+	Source    *string
+	Output    *string
+	FieldTerm *string
+	RowTerm   *string
+	Query     *string
 }
 
 func getArgs() (flags, bool) {
 	args := flags{}
 
 	args.Driver = flag.String("d", "", "driver name  (mysql, mssql, oracle)")
+	args.FieldTerm = flag.String("t", ",", "field term")
+	args.RowTerm = flag.String("r", "\n", "row term")
+	args.Output = flag.String("o", "", "output filename")
 	args.Source = flag.String("s", "",
 		`source
 (e.g mysql user:passwd@tcp(host:3306)/database) 
@@ -78,6 +103,7 @@ func getArgs() (flags, bool) {
 	found := isFlagPassed("d")
 	found = found && isFlagPassed("s")
 	found = found && isFlagPassed("q")
+	found = found && isFlagPassed("o")
 
 	if !found {
 		flag.Usage()
@@ -120,5 +146,5 @@ func main() {
 	}
 	defer rows.Close()
 
-	PrintRows(rows)
+	PrintRows(rows, *args.Output, *args.FieldTerm, *args.RowTerm)
 }
