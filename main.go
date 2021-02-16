@@ -11,6 +11,7 @@ import (
 	_ "github.com/denisenkom/go-mssqldb"
 	_ "github.com/go-sql-driver/mysql"
 	_ "github.com/godror/godror"
+	_ "github.com/mattn/go-adodb"
 )
 
 // PrintRows Rows
@@ -42,12 +43,17 @@ func PrintRows(rows *sql.Rows, filename string, fs string, rs string) {
 			switch (*v).(type) {
 			case nil:
 				c = ""
+			case float64, float32:
+				c = fmt.Sprintf("%f", *v)
+			case int64, int32, int16:
+				c = fmt.Sprintf("%v", *v)
 			default:
 				c = fmt.Sprintf("%s", *v)
 			}
 
 			colsArr = append(colsArr, c)
 		}
+
 		line := strings.Join(colsArr, fs)
 		colsArr = colsArr[:0]
 
@@ -77,17 +83,19 @@ type flags struct {
 func getArgs() (flags, bool) {
 	args := flags{}
 
-	args.Driver = flag.String("d", "", "driver name  (mysql, mssql, oracle)")
+	args.Driver = flag.String("d", "", "driver name  (mysql, mssql, oracle, adodb)")
 	args.FieldTerm = flag.String("t", ",", "field term")
 	args.RowTerm = flag.String("r", "\n", "row term")
 	args.Output = flag.String("o", "", "output filename")
-	args.Source = flag.String("s", "",
-		`source
-(e.g mysql user:passwd@tcp(host:3306)/database) 
-(e.g mssql server=localhost;uid=dev;pwd=devmember;database=dbname) 
-(e.g oracle user/passwd@host:port/sid`)
+	args.Source = flag.String("s", "", `
+	source
+	(e.g mysql user:passwd@tcp(host:3306)/database) 
+	(e.g mssql server=localhost;uid=dev;pwd=devmember;database=dbname) 
+	(e.g oracle user/passwd@host:port/sid
+	(e.g adodb provider=msdasql;dsn=dnsname;uid=user;pwd=passwd `)
 	args.Query = flag.String("q", "", "query ")
-	flag.Bool("", false, "ver. 210215.0")
+
+	flag.Bool("", false, "ver. 210216.1")
 	flag.Parse()
 
 	isFlagPassed := func(name string) bool {
@@ -116,6 +124,7 @@ func getDriverName() map[string]string {
 		"mysql":  "mysql",
 		"mssql":  "mssql",
 		"oracle": "godror",
+		"adodb":  "adodb",
 	}
 
 	return driver
