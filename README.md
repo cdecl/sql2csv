@@ -23,11 +23,11 @@ Usage of bin/sql2csv:
   -r string
         row term (default "\n")
   -s string
-                source
-                (e.g mysql user:passwd@tcp(host:3306)/database)
-                (e.g mssql server=localhost;uid=dev;pwd=devmember;database=dbname)
-                (e.g oracle user/passwd@host:port/sid
-                (e.g adodb provider=msdasql;dsn=dnsname;uid=user;pwd=passwd)
+        source
+        (e.g mysql user:passwd@tcp(host:3306)/database)
+        (e.g mssql server=localhost;uid=dev;pwd=devmember;database=dbname)
+        (e.g oracle user/passwd@host:port/sid
+        (e.g adodb provider=msdasql;dsn=dnsname;uid=user;pwd=passwd)
   -t string
         field term (default ",")
 ```

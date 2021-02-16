@@ -87,13 +87,13 @@ func getArgs() (flags, bool) {
 	args.FieldTerm = flag.String("t", ",", "field term")
 	args.RowTerm = flag.String("r", "\n", "row term")
 	args.Output = flag.String("o", "", "output filename")
-	args.Source = flag.String("s", "",
-		`	source
-	(e.g mysql user:passwd@tcp(host:3306)/database) 
-	(e.g mssql server=localhost;uid=dev;pwd=devmember;database=dbname) 
-	(e.g oracle user/passwd@host:port/sid
-	(e.g adodb provider=msdasql;dsn=dnsname;uid=user;pwd=passwd) `)
 	args.Query = flag.String("q", "", "query ")
+	args.Source = flag.String("s", "",
+		`source
+(e.g mysql user:passwd@tcp(host:3306)/database) 
+(e.g mssql server=localhost;uid=dev;pwd=devmember;database=dbname) 
+(e.g oracle user/passwd@host:port/sid
+(e.g adodb provider=msdasql;dsn=dnsname;uid=user;pwd=passwd) `)
 
 	flag.Bool("", false, "ver. 210216.1")
 	flag.Parse()
