@@ -44,7 +44,7 @@ func PrintRows(rows *sql.Rows, filename string, fs string, rs string) {
 			case nil:
 				c = ""
 			case float64, float32:
-				c = fmt.Sprintf("%f", *v)
+				c = fmt.Sprintf("%v", *v)
 			case int64, int32, int16:
 				c = fmt.Sprintf("%v", *v)
 			default:
@@ -91,9 +91,9 @@ func getArgs() (flags, bool) {
 	args.Source = flag.String("s", "",
 		`source
 (e.g mysql user:passwd@tcp(host:3306)/database) 
-(e.g mssql server=localhost;uid=dev;pwd=devmember;database=dbname) 
+(e.g mssql server=localhost;user id=dev;password=devmember;database=dbname) 
 (e.g oracle user/passwd@host:port/sid
-(e.g adodb provider=msdasql;dsn=dnsname;uid=user;pwd=passwd) `)
+(e.g adodb provider=msdasql;dsn=dnsname;user id=user;password=passwd) `)
 
 	flag.Bool("", false, "ver. 210216.1")
 	flag.Parse()
