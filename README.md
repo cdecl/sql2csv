@@ -25,7 +25,7 @@ Usage of bin/sql2csv:
   -s string
         source
         (e.g mysql user:passwd@tcp(host:3306)/database)
-        (e.g mssql server=localhost;user id=dev;password=devmember;database=dbname)
+        (e.g mssql server=localhost;user id=user;password=passwd;database=dbname)
         (e.g oracle user/passwd@host:port/sid
         (e.g adodb provider=msdasql;dsn=dnsname;user id=user;password=passwd)
   -t string
