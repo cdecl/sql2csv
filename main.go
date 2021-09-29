@@ -5,6 +5,7 @@ import (
 	"database/sql"
 	"flag"
 	"fmt"
+	"io/ioutil"
 	"os"
 	"strings"
 
@@ -77,7 +78,24 @@ type flags struct {
 	Output    *string
 	FieldTerm *string
 	RowTerm   *string
+	QueryFile *string
 	Query     *string
+}
+
+func getFileText(path string) string {
+	if (path == "") || (path == "-") {
+		bs, err := ioutil.ReadAll(os.Stdin)
+		if err != nil {
+			panic(err)
+		}
+		return string(bs)
+	}
+
+	bs, err := ioutil.ReadFile(path)
+	if err != nil {
+		panic(err)
+	}
+	return string(bs)
 }
 
 func getArgs() (flags, bool) {
@@ -87,7 +105,7 @@ func getArgs() (flags, bool) {
 	args.FieldTerm = flag.String("t", ",", "field term")
 	args.RowTerm = flag.String("r", "\n", "row term")
 	args.Output = flag.String("o", "", "output filename")
-	args.Query = flag.String("q", "", "query ")
+	args.QueryFile = flag.String("f", "", "query file (- stdin)")
 	args.Source = flag.String("s", "",
 		`source
 (e.g mysql user:passwd@tcp(host:3306)/database) 
@@ -95,7 +113,7 @@ func getArgs() (flags, bool) {
 (e.g oracle user/passwd@host:port/sid
 (e.g adodb provider=msdasql;dsn=dnsname;user id=user;password=passwd) `)
 
-	flag.Bool("", false, "ver. 210216.1")
+	flag.Bool("", false, "ver. 210929.0")
 	flag.Parse()
 
 	isFlagPassed := func(name string) bool {
@@ -110,12 +128,16 @@ func getArgs() (flags, bool) {
 
 	found := isFlagPassed("d")
 	found = found && isFlagPassed("s")
-	found = found && isFlagPassed("q")
 	found = found && isFlagPassed("o")
 
 	if !found {
 		flag.Usage()
+		return args, found
 	}
+
+	query := getFileText(*args.QueryFile)
+	args.Query = &query
+
 	return args, found
 }
 
