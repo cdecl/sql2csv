@@ -7,7 +7,7 @@ EXEC=$(PROJECT)
 all: build 
 
 build:
-	go build -o $(BIN)/$(EXEC)
+	go build -o $(BIN)/
 
 test:
 	go test -v 
